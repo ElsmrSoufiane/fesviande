@@ -10,69 +10,14 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { aboutData } from '@/data/data'
 
-const values = [
-  {
-    icon: Leaf,
-    title: 'Agriculture Durable',
-    description: "Notre bétail paît en plein air en utilisant des pratiques d'agriculture régénérative qui soignent la terre.",
-  },
-  {
-    icon: Award,
-    title: 'Qualité Premiére',
-    description: 'Chaque coupe est sélectionnée à la main et vieillie à la perfection par nos maîtres bouchers.',
-  },
-  {
-    icon: Heart,
-    title: 'Bien-être Animal',
-    description: 'Nous croyons en un traitement humain. Nos animaux vivent sans stress dans des fermes familiales.',
-  },
-  {
-    icon: MapPin,
-    title: 'Approvisionnement Local',
-    description: 'Nous collaborons avec plus de 50 fermes locales pour garantir la fraîcheur et soutenir les communautés.',
-  },
-]
-
-const stats = [
-  { value: '50+', label: 'Fermes Partenaires' },
-  { value: '28', label: 'Jours de Vieillissement' },
-  { value: '100%', label: 'Nourri à l\'Herbe' },
-  { value: '4.9', label: 'Note Clients' },
-]
-
-const certificates = [
-  {
-    title: 'Certification Viande de Qualité',
-    issuer: 'Institut National de l\'Origine et de la Qualité',
-    year: '2024',
-    description: 'Plus haute note de qualité pour le boeuf, attribuée pour son persillage et sa tendresse exceptionnels.',
-  },
-  {
-    title: 'Label Bien-Être Animal',
-    issuer: 'Association Française du Bien-Être Animal',
-    year: '2023',
-    description: 'Reconnu pour répondre aux normes les plus élevées en matière de bien-être animal.',
-  },
-  {
-    title: 'Prix Agriculture Durable',
-    issuer: 'Association pour le Développement de l\'Agriculture Durable',
-    year: '2024',
-    description: 'Excellence en agriculture régénérative et gestion environnementale.',
-  },
-  {
-    title: 'Meilleur Boucher Local 2024',
-    issuer: 'Association des Critiques Gastronomiques',
-    year: '2024',
-    description: 'Élu premier choix pour les coupes premium et le service client exceptionnel.',
-  },
-  {
-    title: 'Certification Bio',
-    issuer: 'Agence Bio Française',
-    year: '2023',
-    description: 'Tous nos produits respectent les normes biologiques strictes de la ferme à la table.',
-  },
-]
+const iconMap: Record<string, typeof Leaf> = {
+  Leaf,
+  Award,
+  Heart,
+  MapPin,
+}
 
 export default function AboutPage() {
   return (
@@ -87,7 +32,7 @@ export default function AboutPage() {
               transition={{ duration: 0.8 }}
             >
               <h1 className="text-4xl sm:text-5xl font-bold leading-tight text-balance">
-                De Nos <span className="text-primary">Fermes</span> À Votre Table
+                De Nos <span className="text-primary">{aboutData.hero.highlightedWord}</span> À Votre Table
               </h1>
               <motion.p 
                 className="mt-6 text-lg text-sidebar-foreground/80 leading-relaxed"
@@ -95,9 +40,7 @@ export default function AboutPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                Depuis trois générations, la famille Moreau s'engage à fournir les viandes de la plus haute qualité.
-                Ce qui a commencé comme une petite boucherie familiale en 1952 est devenu une source fiable de viandes premium,
-                élevées de manière éthique.
+                {aboutData.hero.description1}
               </motion.p>
               <motion.p 
                 className="mt-4 text-lg text-sidebar-foreground/80 leading-relaxed"
@@ -105,8 +48,7 @@ export default function AboutPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                Nous croyons que le bon goût commence par un grand soin. C'est pourquoi nous travaillons directement avec les agriculteurs locaux
-                qui partagent notre engagement envers les pratiques durables et le bien-être animal.
+                {aboutData.hero.description2}
               </motion.p>
             </motion.div>
             <motion.div 
@@ -116,8 +58,8 @@ export default function AboutPage() {
               transition={{ duration: 0.8 }}
             >
               <motion.img
-                src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=800&h=600&fit=crop"
-                alt="Cattle grazing on green pastures"
+                src={aboutData.hero.image}
+                alt={aboutData.hero.imageAlt}
                 className="w-full h-full object-cover"
                 initial={{ scale: 1.1 }}
                 animate={{ scale: 1 }}
@@ -132,7 +74,7 @@ export default function AboutPage() {
       <section className="py-10 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {aboutData.stats.map((stat, index) => (
               <motion.div 
                 key={stat.label} 
                 className="text-center"
@@ -164,23 +106,26 @@ export default function AboutPage() {
             </p>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
-              <motion.div 
-                key={value.title} 
-                className="text-center"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <value.icon className="w-8 h-8 text-secondary-foreground" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">{value.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
-              </motion.div>
-            ))}
+            {aboutData.values.map((value, index) => {
+              const IconComponent = iconMap[value.icon]
+              return (
+                <motion.div 
+                  key={value.title} 
+                  className="text-center"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -5 }}
+                >
+                  <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-8 h-8 text-secondary-foreground" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{value.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -209,7 +154,7 @@ export default function AboutPage() {
               className="w-full"
             >
               <CarouselContent>
-                {certificates.map((cert, index) => (
+                {aboutData.certificates.map((cert, index) => (
                   <CarouselItem key={cert.title} className="md:basis-1/2 lg:basis-1/3">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -259,7 +204,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            Prêt à Gouter la Différence?
+            {aboutData.cta.title}
           </motion.h2>
           <motion.p 
             className="mt-4 text-primary-foreground/80 max-w-xl mx-auto"
@@ -268,7 +213,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
           >
-            Parcourez notre sélection de viandes premium, sourcées de manière éthique, et découvrez ce que la vraie qualité a de différent.
+            {aboutData.cta.description}
           </motion.p>
           <Link to="/">
             <motion.div
@@ -283,7 +228,7 @@ export default function AboutPage() {
                 variant="outline"
                 className="mt-8 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary font-semibold px-8"
               >
-                COMMANDER
+                {aboutData.cta.buttonText}
               </Button>
             </motion.div>
           </Link>

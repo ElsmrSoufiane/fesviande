@@ -1,15 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Lock } from 'lucide-react'
 import { useState } from 'react'
+import { brand, navLinks } from '@/data/data'
 
 export function Navbar() {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const navLinks = [
-    { href: '/', label: 'Produits' },
-    { href: '/about', label: 'À Propos' },
-  ]
 
   return (
     <header className="bg-sidebar text-sidebar-foreground sticky top-0 z-50">
@@ -18,9 +14,9 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">VF</span>
+              <span className="text-primary-foreground font-bold text-sm">{brand.shortName}</span>
             </div>
-            <span className="font-bold text-lg tracking-tight">VIANDE FES</span>
+            <span className="font-bold text-lg tracking-tight">{brand.name}</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -36,15 +32,30 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              to="/admin"
+              className="flex items-center gap-1 text-sm font-medium text-sidebar-foreground/60 hover:text-primary transition-colors"
+            >
+              <Lock className="w-4 h-4" />
+              Admin
+            </Link>
           </nav>
 
           {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 hover:bg-sidebar-accent rounded-full transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/admin"
+              className="md:hidden p-2 hover:bg-sidebar-accent rounded-full transition-colors"
+            >
+              <Lock className="w-5 h-5" />
+            </Link>
+            <button
+              className="p-2 hover:bg-sidebar-accent rounded-full transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -62,6 +73,13 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              to="/admin"
+              className="block py-2 text-sm font-medium text-sidebar-foreground/60 hover:text-primary transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Connexion Admin
+            </Link>
           </nav>
         )}
       </div>

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
@@ -9,164 +8,12 @@ import {
   CarouselItem,
   useCarousel,
 } from '@/components/ui/carousel'
+import { heroSlides, categories, products } from '@/data/data'
 
-const categories = [
-  { id: 'all', name: 'Tous les Produits' },
-  { id: 'beef', name: 'Bœuf Wagyu' },
-  { id: 'poultry', name: 'Volaille Bio' },
-  { id: 'lamb', name: 'Agneau' },
-]
-
-const heroSlides = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=1200&h=600&fit=crop',
-    title: 'BŒUF WAGYU',
-    subtitle: 'Excellence Japonaise Grade A5',
-    description: 'Découvrez le summum du persillage et de la saveur avec nos sélections Wagyu premium.',
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=1200&h=600&fit=crop',
-    title: 'RIB-EYE VIEILLI',
-    subtitle: '28 Jours de Perfection',
-    description: 'Steaks découpés à la main, vieillis dans notre cave climatique pour une tendresse exceptionnelle.',
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=1200&h=600&fit=crop',
-    title: 'COLLECTION AGNEAU',
-    subtitle: 'Excellence Élevée en Pâturage',
-    description: "Carrés et coupes premium issus d'agnneaux élevés en pâturage et nourris à l'herbe.",
-  },
-  {
-    id: 4,
-    image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=1200&h=600&fit=crop',
-    title: 'VOLAILLE BIO',
-    subtitle: 'Plein Air & Naturel',
-    description: 'Poulet sans antibiotique élevé avec soin dans des fermes familiales.',
-  },
-]
-
-const products = [
-  {
-    id: 1,
-    name: 'Rib-Eye Vieilli',
-    price: 42.0,
-    description: 'Steak découpé à la main, vieilli 28 jours dans notre cave climatique.',
-    images: [
-      'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1558030006-450675393462?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=500&h=500&fit=crop',
-    ],
-    isBestseller: true,
-    category: 'beef',
-  },
-  {
-    id: 2,
-    name: 'Carré d\'Agneau',
-    price: 38.5,
-    description: 'Carré de 8 côtes désossé, élevé en pâturage et parfaitement persillé.',
-    images: [
-      'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1608877907149-a206d75ba011?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1574484284002-952d92456975?w=500&h=500&fit=crop',
-    ],
-    isBestseller: false,
-    category: 'lamb',
-  },
-  {
-    id: 3,
-    name: 'Filet de Wagyu',
-    price: 89.0,
-    description: 'Wagyu japonais A5, persillage exceptionnel et texture beurrée.',
-    images: [
-      'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&h=500&fit=crop',
-    ],
-    isBestseller: true,
-    category: 'beef',
-  },
-  {
-    id: 4,
-    name: 'Blanc de Poulet Bio',
-    price: 18.0,
-    description: 'Poulet de plein air sans antibiotique au goût exceptionnel.',
-    images: [
-      'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1606728035253-49e8a23146de?w=500&h=500&fit=crop',
-    ],
-    isBestseller: false,
-    category: 'poultry',
-  },
-  {
-    id: 5,
-    name: 'Canard Entier',
-    price: 34.0,
-    description: 'Canard de Pekin élevé en ferme, parfait pour le rôtissage.',
-    images: [
-      'https://images.unsplash.com/photo-1606728035253-49e8a23146de?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&h=500&fit=crop',
-    ],
-    isBestseller: false,
-    category: 'poultry',
-  },
-  {
-    id: 6,
-    name: 'Gigot d\'Agneau',
-    price: 45.0,
-    description: "Gigot désossé avec os, élevé à l'herbe et parfait pour les réunions.",
-    images: [
-      'https://images.unsplash.com/photo-1574484284002-952d92456975?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1608877907149-a206d75ba011?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=500&h=500&fit=crop',
-    ],
-    isBestseller: false,
-    category: 'lamb',
-  },
-  {
-    id: 7,
-    name: 'Poitrine de Bœuf Prime',
-    price: 56.0,
-    description: 'Grade USDA Prime, idéal pour le fumage lent ou le braisage.',
-    images: [
-      'https://images.unsplash.com/photo-1529694157872-4e0c0f3b238b?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=500&h=500&fit=crop',
-    ],
-    isBestseller: true,
-    category: 'beef',
-  },
-  {
-    id: 8,
-    name: 'Cuisses de Poulet',
-    price: 14.0,
-    description: 'Cuisses avec os et peau de poulets bio de plein air.',
-    images: [
-      'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1606728035253-49e8a23146de?w=500&h=500&fit=crop',
-    ],
-    isBestseller: false,
-    category: 'poultry',
-  },
-  {
-    id: 9,
-    name: 'Côtelettes d\'Agneau',
-    price: 32.0,
-    description: "Côtelettes d'agneau premium, tendres et savoureuses.",
-    images: [
-      'https://images.unsplash.com/photo-1608877907149-a206d75ba011?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=500&h=500&fit=crop',
-      'https://images.unsplash.com/photo-1574484284002-952d92456975?w=500&h=500&fit=crop',
-    ],
-    isBestseller: true,
-    category: 'lamb',
-  },
-]
+function getMinPrice(priceObj: { [key: number]: number }): number {
+  const prices = Object.values(priceObj)
+  return Math.min(...prices)
+}
 
 function ProductCard({ product, index }: { product: typeof products[0]; index: number }) {
   const [currentImage, setCurrentImage] = useState(0)
@@ -190,8 +37,8 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -5 }}
     >
-      <Link
-        to={`/product/${product.id}`}
+      <a
+        href={`/product/${product.id}`}
         className="bg-card rounded-xl overflow-hidden border border-border hover:shadow-lg transition-shadow block"
       >
         <div className="relative h-48 group overflow-hidden">
@@ -242,14 +89,14 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
         <div className="p-5">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="font-semibold text-card-foreground">{product.name}</h3>
-            <span className="text-primary font-bold">À partir de {Math.min(...Object.values(product.price)).toFixed(2)}€</span>
+            <span className="text-primary font-bold">À partir de {getMinPrice(product.price).toFixed(2)}€</span>
           </div>
           <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{product.description}</p>
           <Button className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground">
             VOIR LES DÉTAILS
           </Button>
         </div>
-      </Link>
+      </a>
     </motion.div>
   )
 }
