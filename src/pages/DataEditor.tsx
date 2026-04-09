@@ -1,13 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Upload, Copy, Check, Save, Plus, X, ImageIcon, Eye, ExternalLink } from 'lucide-react'
+import { Upload, Copy, Check, Save, Plus, X, ImageIcon, Eye, ExternalLink, Settings, Github, Loader2 } from 'lucide-react'
 import { products as initialProducts, heroSlides as initialHeroSlides, categories as initialCategories } from '@/data/data'
 import ProductPreview from './ProductPreview'
 import type { Product } from '@/data/types'
 
 interface EditedProduct extends Product {}
+
+interface GitHubSettings {
+  token: string
+  owner: string
+  repo: string
+  branch: string
+}
 
 const cloudinaryConfig = {
   cloudName: 'dyb9rkpwj',
@@ -16,6 +23,13 @@ const cloudinaryConfig = {
 
 let widgetInstance: any = null
 
+const DEFAULT_GITHUB: GitHubSettings = {
+  token: '',
+  owner: 'ElsmrSoufiane',
+  repo: 'fesviande',
+  branch: 'master',
+}
+
 export default function DataEditor() {
   const [products, setProducts] = useState<EditedProduct[]>(initialProducts)
   const [heroSlides, setHeroSlides] = useState(initialHeroSlides)
@@ -23,8 +37,89 @@ export default function DataEditor() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [editedProduct, setEditedProduct] = useState<EditedProduct | null>(null)
   const [copied, setCopied] = useState(false)
-  const [activeSection, setActiveSection] = useState<'products' | 'hero' | 'categories' | 'preview'>('products')
+  const [activeSection, setActiveSection] = useState<'products' | 'hero' | 'categories' | 'preview' | 'settings'>('products')
   const [uploadCallback, setUploadCallback] = useState<((url: string) => void) | null>(null)
+  const [githubSettings, setGithubSettings] = useState<GitHubSettings>(DEFAULT_GITHUB)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<{ success: boolean; message: string } | null>(null)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('githubSettings')
+    if (saved) {
+      setGithubSettings(JSON.parse(saved))
+    }
+  }, [])
+
+  const saveGithubSettings = () => {
+    localStorage.setItem('githubSettings', JSON.stringify(githubSettings))
+    setSaveStatus({ success: true, message: 'Paramètres sauvegardés!' })
+    setTimeout(() => setSaveStatus(null), 3000)
+  }
+
+  const saveToGitHub = async () => {
+    if (!githubSettings.token) {
+      setSaveStatus({ success: false, message: 'Token GitHub requis!' })
+      return
+    }
+
+    setIsSaving(true)
+    setSaveStatus(null)
+
+    try {
+      const content = generateDataFile()
+      const base64Content = btoa(unescape(encodeURIComponent(content)))
+      const filePath = 'src/data/data.ts'
+
+      const getFileUrl = `https://api.github.com/repos/${githubSettings.owner}/${githubSettings.repo}/contents/${filePath}?ref=${githubSettings.branch}`
+      
+      const getResponse = await fetch(getFileUrl, {
+        headers: {
+          'Authorization': `token ${githubSettings.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      })
+
+      let sha = ''
+      if (getResponse.ok) {
+        const fileData = await getResponse.json()
+        sha = fileData.sha
+      }
+
+      const commitUrl = `https://api.github.com/repos/${githubSettings.owner}/${githubSettings.repo}/contents/${filePath}`
+      
+      const commitData: any = {
+        message: `chore: Update data.ts from dashboard - ${new Date().toLocaleString('fr-FR')}`,
+        content: base64Content,
+        branch: githubSettings.branch,
+      }
+      
+      if (sha) {
+        commitData.sha = sha
+      }
+
+      const response = await fetch(commitUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${githubSettings.token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify(commitData),
+      })
+
+      if (response.ok) {
+        setSaveStatus({ success: true, message: 'Données enregistrées sur GitHub!' })
+      } else {
+        const error = await response.json()
+        setSaveStatus({ success: false, message: error.message || 'Erreur lors de la sauvegarde' })
+      }
+    } catch (error) {
+      setSaveStatus({ success: false, message: 'Erreur de connexion!' })
+    }
+
+    setIsSaving(false)
+    setTimeout(() => setSaveStatus(null), 5000)
+  }
 
   const openWidget = (onUpload: (url: string) => void) => {
     setUploadCallback(() => onUpload)
@@ -116,7 +211,7 @@ export default function DataEditor() {
   }
 
   const generateDataFile = () => {
-    const code = `export const brand = {
+    return `export const brand = {
   name: 'VIANDE FES',
   shortName: 'VF',
   tagline: 'Excellence en viande premium',
@@ -161,7 +256,7 @@ export const aboutData = {
     imageAlt: 'Ferme locale avec bétail',
   },
   stats: [
-    { value: '15+', label: 'Années d\'expérience' },
+    { value: '15+', label: 'Années d\\'expérience' },
     { value: '50+', label: 'Fermes partenaires' },
     { value: '10K+', label: 'Clients satisfaits' },
     { value: '100%', label: 'Qualité garantie' },
@@ -170,16 +265,16 @@ export const aboutData = {
     { icon: 'Leaf', title: 'Durabilité', description: 'Nous privilégions les pratiques agricoles responsables et le bien-être animal.' },
     { icon: 'Award', title: 'Excellence', description: 'Chaque produit est inspecté pour garantir une qualité supérieure.' },
     { icon: 'Heart', title: 'Passion', description: 'Notre amour pour la bonne viande se retrouve dans chaque détail.' },
-    { icon: 'MapPin', title: 'Local', description: 'Nous soutenons les producteurs locaux et réduisons l\'empreinte carbone.' },
+    { icon: 'MapPin', title: 'Local', description: 'Nous soutenons les producteurs locaux et réduisons l\\'empreinte carbone.' },
   ],
   certificates: [
-    { title: 'Certification Bio', issuer: 'ECOCERT', year: '2024', description: 'Engagement envers l\'agriculture biologique et les pratiques durables.' },
+    { title: 'Certification Bio', issuer: 'ECOCERT', year: '2024', description: 'Engagement envers l\\'agriculture biologique et les pratiques durables.' },
     { title: 'Bien-être Animal', issuer: 'Label Rouge', year: '2024', description: 'Normes strictes pour le bien-être et la santé animale.' },
-    { title: 'Traçabilité Complète', issuer: 'IFS Food', year: '2023', description: 'Piste de traçabilité du ferme jusqu\'à votre assiette.' },
+    { title: 'Traçabilité Complète', issuer: 'IFS Food', year: '2023', description: 'Piste de traçabilité du ferme jusqu\\'à votre assiette.' },
   ],
   cta: {
     title: 'Découvrez Nos Produits Premium',
-    description: 'Partez à la découverte de notre sélection de viandes d\'exception, préparées avec passion et savoir-faire.',
+    description: 'Partez à la découverte de notre sélection de viandes d\\'exception, préparées avec passion et savoir-faire.',
     buttonText: 'VOIR NOS PRODUITS',
   },
 }
@@ -199,8 +294,12 @@ export const metaData = {
   description: 'Boutique en ligne de viande premium au Maroc. Viandes fraîches et surgelées de qualité supérieure.',
   lang: 'fr',
 }
+
+export const navLinks = [
+  { href: '/', label: 'Accueil' },
+  { href: '/about', label: 'À propos' },
+]
 `
-    return code
   }
 
   const copyToClipboard = () => {
@@ -217,8 +316,21 @@ export const metaData = {
           <p className="text-muted-foreground mb-8">Modifiez les données du site et générez le fichier data.ts</p>
         </motion.div>
 
-        <div className="flex gap-4 mb-8">
-          {(['products', 'hero', 'categories', 'preview'] as const).map((section) => (
+        {saveStatus && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${
+              saveStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            }`}
+          >
+            {saveStatus.success ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
+            {saveStatus.message}
+          </motion.div>
+        )}
+
+        <div className="flex gap-4 mb-8 flex-wrap">
+          {(['products', 'hero', 'categories', 'preview', 'settings'] as const).map((section) => (
             <Button
               key={section}
               onClick={() => setActiveSection(section)}
@@ -226,12 +338,103 @@ export const metaData = {
             >
               {section === 'products' ? 'Produits' : 
                section === 'hero' ? 'Hero Slides' : 
-               section === 'categories' ? 'Catégories' : (
+               section === 'categories' ? 'Catégories' :
+               section === 'preview' ? (
                 <span className="flex items-center gap-2"><Eye className="w-4 h-4" /> Aperçu</span>
+              ) : (
+                <span className="flex items-center gap-2"><Settings className="w-4 h-4" /> Paramètres</span>
               )}
             </Button>
           ))}
+          <Button onClick={saveToGitHub} disabled={isSaving} className="bg-green-600 hover:bg-green-700">
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Github className="w-4 h-4 mr-2" />
+            )}
+            Sauvegarder sur GitHub
+          </Button>
         </div>
+
+        {activeSection === 'settings' && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Github className="w-5 h-5" />
+                Paramètres GitHub
+              </CardTitle>
+              <CardDescription>
+                Configurez la connexion à votre dépôt GitHub pour sauvegarder automatiquement les modifications
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Personal Access Token (PAT)
+                </label>
+                <input
+                  type="password"
+                  value={githubSettings.token}
+                  onChange={(e) => setGithubSettings({ ...githubSettings, token: e.target.value })}
+                  placeholder="ghp_xxxxxxxxxxxx"
+                  className="w-full p-3 border rounded-lg"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Créez un token sur GitHub → Settings → Developer settings → Personal access tokens
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Owner</label>
+                  <input
+                    type="text"
+                    value={githubSettings.owner}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, owner: e.target.value })}
+                    className="w-full p-3 border rounded-lg"
+                    placeholder="username"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Repository</label>
+                  <input
+                    type="text"
+                    value={githubSettings.repo}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, repo: e.target.value })}
+                    className="w-full p-3 border rounded-lg"
+                    placeholder="repo-name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Branch</label>
+                  <input
+                    type="text"
+                    value={githubSettings.branch}
+                    onChange={(e) => setGithubSettings({ ...githubSettings, branch: e.target.value })}
+                    className="w-full p-3 border rounded-lg"
+                    placeholder="main"
+                  />
+                </div>
+              </div>
+
+              <Button onClick={saveGithubSettings} variant="outline">
+                <Save className="w-4 h-4 mr-2" />
+                Sauvegarder les paramètres
+              </Button>
+
+              <div className="bg-muted p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Comment créer un Personal Access Token:</h4>
+                <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                  <li>Allez sur GitHub → Settings → Developer settings</li>
+                  <li>Cliquez sur "Personal access tokens" → "Tokens (classic)"</li>
+                  <li>Cliquez "Generate new token"</li>
+                  <li>Donnez un nom, sélectionnez "repo" scope</li>
+                  <li>Copiez le token et collez-le ci-dessus</li>
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {activeSection === 'preview' && (
           <Card>
