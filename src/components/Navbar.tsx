@@ -50,7 +50,7 @@ export function Navbar() {
               <Lock className="w-5 h-5" />
             </Link>
             <button
-              className="p-2 hover:bg-sidebar-accent rounded-full transition-colors"
+              className="md:hidden p-2 hover:bg-sidebar-accent rounded-full transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
