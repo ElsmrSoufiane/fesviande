@@ -80,7 +80,7 @@ export const features = [
 export const products = [
   {
     "id": 1,
-    "name": "Rib-Eye Vieilli",
+    "name": "produit1",
     "price": {
       "250": 42,
       "500": 80,
