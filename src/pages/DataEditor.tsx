@@ -5,9 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Upload, Copy, Check, Save, Plus, X, ImageIcon, Eye, ExternalLink, Settings, Github, Loader2 } from 'lucide-react'
 import { products as initialProducts, heroSlides as initialHeroSlides, categories as initialCategories } from '@/data/data'
 import ProductPreview from './ProductPreview'
-import type { Product } from '@/data/types'
-
-interface EditedProduct extends Product {}
 
 interface GitHubSettings {
   token: string
@@ -31,11 +28,11 @@ const DEFAULT_GITHUB: GitHubSettings = {
 }
 
 export default function DataEditor() {
-  const [products, setProducts] = useState<EditedProduct[]>(initialProducts)
+  const [products, setProducts] = useState<any[]>(initialProducts)
   const [heroSlides, setHeroSlides] = useState(initialHeroSlides)
   const [categories] = useState(initialCategories)
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
-  const [editedProduct, setEditedProduct] = useState<EditedProduct | null>(null)
+  const [editedProduct, setEditedProduct] = useState<any>(null)
   const [copied, setCopied] = useState(false)
   const [activeSection, setActiveSection] = useState<'products' | 'hero' | 'categories' | 'preview' | 'settings'>('products')
   const [uploadCallback, setUploadCallback] = useState<((url: string) => void) | null>(null)
@@ -645,7 +642,7 @@ export const navLinks = [
                     <div>
                       <label className="text-sm font-medium">Images (cartes)</label>
                       <div className="space-y-2 mt-2">
-                        {editedProduct.images.map((img, idx) => (
+                        {editedProduct.images.map((img: string, idx: number) => (
                           <div key={idx} className="flex gap-2 items-center">
                             <input
                               type="text"
@@ -672,7 +669,7 @@ export const navLinks = [
                               size="sm"
                               variant="destructive"
                               onClick={() => {
-                                const newImages = editedProduct.images.filter((_, i) => i !== idx)
+                                const newImages = editedProduct.images.filter((_: string, i: number) => i !== idx)
                                 updateProduct('images', newImages)
                               }}
                             >
@@ -693,7 +690,7 @@ export const navLinks = [
                     <div>
                       <label className="text-sm font-medium">Gallery Images (détails)</label>
                       <div className="space-y-2 mt-2">
-                        {editedProduct.galleryImages.map((img, idx) => (
+                        {editedProduct.galleryImages.map((img: string, idx: number) => (
                           <div key={idx} className="flex gap-2 items-center">
                             <input
                               type="text"
@@ -720,7 +717,7 @@ export const navLinks = [
                               size="sm"
                               variant="destructive"
                               onClick={() => {
-                                const newImages = editedProduct.galleryImages.filter((_, i) => i !== idx)
+                                const newImages = editedProduct.galleryImages.filter((_: string, i: number) => i !== idx)
                                 updateProduct('galleryImages', newImages)
                               }}
                             >

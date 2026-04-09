@@ -27,7 +27,7 @@ export default function ProductDetailsPage() {
     )
   }
 
-  const currentPrice = product.price[selectedWeight] || 0
+  const currentPrice = (product.price as any)[selectedWeight] || 0
 
   const nextImage = () => setSelectedImage((prev) => (prev + 1) % product.galleryImages.length)
   const prevImage = () => setSelectedImage((prev) => (prev - 1 + product.galleryImages.length) % product.galleryImages.length)

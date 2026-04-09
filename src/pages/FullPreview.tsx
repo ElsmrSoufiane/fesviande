@@ -2,23 +2,8 @@ import { useState, useEffect } from 'react'
 import { products as initialProducts, heroSlides as initialHeroSlides, categories as initialCategories } from '@/data/data'
 import ProductPreview from './ProductPreview'
 
-interface EditedProduct {
-  id: number
-  name: string
-  price: { [key: number]: number }
-  description: string
-  fullDescription: string
-  origin: string
-  weight: string
-  images: string[]
-  galleryImages: string[]
-  nutrition: { calories: number; protein: number; fat: number; carbs: number }
-  isBestseller: boolean
-  category: string
-}
-
 export default function FullPreview() {
-  const [products, setProducts] = useState<EditedProduct[]>(initialProducts)
+  const [products, setProducts] = useState<any[]>(initialProducts)
   const [heroSlides, setHeroSlides] = useState(initialHeroSlides)
   const [categories, setCategories] = useState(initialCategories)
 

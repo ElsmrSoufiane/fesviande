@@ -74,7 +74,7 @@ export interface Nutrition {
 export interface Product {
   id: number
   name: string
-  price: { [key: number]: number }
+  price: { [key: string]: number | undefined }
   description: string
   fullDescription: string
   origin: string
