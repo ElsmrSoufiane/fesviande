@@ -200,7 +200,7 @@ export default function ProductDetailsPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    {weight}g - {product.price[weight].toFixed(2)}€
+                    {weight}g - {(product.price as any)[weight]?.toFixed(2) || 'N/A'}€
                   </motion.button>
                 ))}
               </div>
@@ -223,13 +223,16 @@ export default function ProductDetailsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {weights.map((weight) => (
+                  {weights.map((weight) => {
+                    const price = (product.price as any)[weight]
+                    return (
                     <tr key={weight} className="border-t border-border">
                       <td className="py-2">{weight}g</td>
-                      <td className="py-2 font-medium">{product.price[weight].toFixed(2)}€</td>
-                      <td className="py-2 text-muted-foreground">{(product.price[weight] / weight * 1000).toFixed(2)}€/kg</td>
+                      <td className="py-2 font-medium">{price?.toFixed(2) || 'N/A'}€</td>
+                      <td className="py-2 text-muted-foreground">{price ? (price / weight * 1000).toFixed(2) : 'N/A'}€/kg</td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </motion.div>

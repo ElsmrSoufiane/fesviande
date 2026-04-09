@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/carousel'
 import { heroSlides, categories, products } from '@/data/data'
 
-function getMinPrice(priceObj: { [key: number]: number }): number {
-  const prices = Object.values(priceObj)
+function getMinPrice(priceObj: { [key: string]: number }): number {
+  const prices = Object.values(priceObj).filter(p => typeof p === 'number') as number[]
   return Math.min(...prices)
 }
 
